@@ -1,0 +1,10 @@
+Allora, in pratica:
+Devo separare le cose:
+
+Il mio Helper principale è il gDrive Client: lo richiamo ovunque con gDriveClient.upload(_file_da_inviare)
+
+Io voglio che il gDriveClient utilizzi un OAuth di un utente
+Come faccio?
+Nell'altro file l'omino utilizza un Access_token <----------- GUARDA QUESTO PLSs
+
+

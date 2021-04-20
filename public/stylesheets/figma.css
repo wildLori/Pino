@@ -1,0 +1,20 @@
+.b{
+/* Auto Layout */
+
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 6px 12px;
+
+position: absolute;
+width: 69px;
+height: 36px;
+left: 547px;
+top: 788px;
+
+/* Global/01. Primary */
+
+background: #007BFF;
+border-radius: 4px;
+}
