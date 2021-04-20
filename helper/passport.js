@@ -6,11 +6,10 @@ require('dotenv').config({ path: path.resolve(__dirname, '../private/.env') })
  * Dati dell'account di Google Drive
  */
 
-const OAuthClient
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI; //Callback
-const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI; //Callback
+const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
 
 const oauth2Client = new google.auth.OAuth2( //Il mio Oggetto che espone i dati del client
   CLIENT_ID,

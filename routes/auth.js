@@ -12,17 +12,23 @@ router.get('/login', function (req, res) {
 })
 
 /**
- * Redirect dopo il Login
+ * Se mi arriva /login/google vuol dire che qualcuno vuole autenticarsi con google
+ * Io lo re-indirizzo alla solita paginetta bianca
+ * di google per loggarsi e autorizzare
+ * l'accesso a google drive + info basiche del profilo
  */
 router.get('/login/google', passport.authenticate("google", {
     scope: ['profile', "https://www.googleapis.com/auth/drive.file", "email"]
 }))
 
 /**
- * Callback che mi arriva da Google con il Token.
- * Gestisco la autenticazione con Passport
+ * Redirect dopo il login Callback che mi arriva da Google con il Token.
+ * La roba che mi arriva passa attravero Passport.Google e poi sa lui come
+ * entrare. (glielo ho spiegato nella classe passport.js)
+ * FINE : Se tutto va bene, l'utente può accedere alla Dashboard
  */
 router.get('/google/redirect', passport.authenticate('google'), function (req, res) {
+    //TODO: Dovrei mettere un aggiunta al DB del token dell'utente?
     res.redirect('/dashboard')
 })
 
