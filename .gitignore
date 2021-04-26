@@ -106,3 +106,4 @@ dist
 # Niente file privatis
 private/
 *.pem
+tmp/
