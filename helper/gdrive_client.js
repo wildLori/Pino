@@ -20,6 +20,9 @@ const {
   Readable
 } = require('stream');
 
+var stream = require('stream');
+var destroy = require('destroy');
+
 
 
 /**
@@ -79,7 +82,7 @@ async function uploadFile(nome_file, filePath) {
 async function uploadFromBuffer(nome_file, buffer) {
 
   const mimeType = "image/jpeg";
-  const filename = "immagine" + Date.now().toString();
+  const filename = nome_file + Date.now().toString();
 
   /**
    * Imposto Credenziali con l'acccessToken
@@ -92,7 +95,11 @@ async function uploadFromBuffer(nome_file, buffer) {
     auth: driveAuth
   });
 
-  var stream = await Readable.from(myBuffer.toString());
+
+  let bufferStream = new stream.PassThrough();
+  await bufferStream.end(buffer);
+  //console.log(bufferStream);
+  //var stream = await Readable.from(Buffer.toString());
   return (await drive.files.create({
     resource: {
       name: filename,
@@ -100,21 +107,11 @@ async function uploadFromBuffer(nome_file, buffer) {
       parents: [folderUrl]
     },
     media: {
-      mimeType,
-      uploadType: "media",
-      stream,
+      mimeType: mimeType,
+      body: bufferStream,
     },
     fields: '*'
   })).data
-}
-
-
-
-
-async function createFolder(filePath) {
-  /**
-   *  
-   */
 }
 
 async function listFiles(param_pageSize = 10) {
@@ -156,40 +153,6 @@ async function listFiles(param_pageSize = 10) {
   });
 }
 
-
-/**
- * Lists the recent activity in your Google Drive.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-function listDriveActivity(auth) {
-  const service = google.driveactivity({
-    version: 'v2',
-    auth
-  });
-  const params = {
-    'pageSize': 10,
-  };
-  service.activity.query({
-    requestBody: params
-  }, (err, res) => {
-    if (err) return console.error('The API returned an error: ' + err);
-    const activities = res.data.activities;
-    if (activities) {
-      console.log('Recent activity:');
-      activities.forEach((activity) => {
-        const time = getTimeInfo(activity);
-        const action = getActionInfo(activity.primaryActionDetail);
-        const actors = activity.actors.map(getActorInfo);
-        const targets = activity.targets.map(getTargetInfo);
-        console.log(`${time}: ${truncated(actors)}, ${action}, ` +
-          `${truncated(targets)}`);
-      });
-    } else {
-      console.log('No activity.');
-    }
-  });
-}
 
 async function deleteFile(file_id) {
   try {

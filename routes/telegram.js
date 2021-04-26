@@ -224,20 +224,34 @@ bot.hears('➕ Aggiungi', async (ctx) => {
 })
 
 bot.action('aggiungiTesto', async (ctx) => {
-  //1. Chiedi testo
-  //2 Aggiungi testo a JSON
+  //🔴 TODO: Questo è solo un test, la funzione per uploadare deve essere spotata su un bottone apposito!!!!!!!
+  let file_name = "test";
   let data = Date.now().toString();
   let url = await ottieniUltimoLink(ctx.from.id);
   ctx.reply(url);
-  var buffer = await imageManager.aggiungiTesto(url, data);
-  await console.log(buffer);
+  var buffer = await imageManager.aggiungiTesto(url);
+  var res = await gdrive_client.uploadFromBuffer(file_name, buffer);
+  console.log("Upload terminato!" /*+ res*/ );
+  ctx.reply(res);
+  //await modelManager.apriDB();
+
   //4. Carica su Drive
 
 })
 
 bot.action('carica', async (ctx) => {
+  let id_utente = ctx.from.id;
   gdrive_client.uploadFromBuffer()
+  try {
+
+  } catch (error) {
+
+  } finally {
+    resetUtenteAttivo(id_utente)
+  }
   ctx.reply("Immagine salvata correttamente ☑");
+
+
 })
 
 bot.command('broadcast', ctx => {
@@ -271,6 +285,17 @@ bot.command('broadcast', ctx => {
  * 
  */
 
+/**
+ * Resetta tutti i valori dell'utente dopo che ha caricato correttamente l'immagine
+ * @param {*} id_utente 
+ */
+async function resetUtenteAttivo(id_utente) {
+  if (utentiAttivi.hasOwnProperty(id_utente)) {
+    utentiAttivi[id_utente].last_photo_url = "";
+    utentiAttivi[id_utente].to_delete_message = "";
+    utentiAttivi[id_utente].is_choosing_reostato = false;
+  }
+}
 
 /**
  * Questa funzione mi serve per aggiungere agli utenti attivi un Model di utente attivo
