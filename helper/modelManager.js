@@ -1,26 +1,23 @@
 //const sqlite3 = require('sqlite3').verbose(); //DEV 
 const sqlite3 = require('sqlite3'); //PRODUCTION
 const db_path = '/home/pi/Server/private/data/DB_Officina.db';
-var db;
+// var db;
 
-/**
- * ❤ NEW PROMISE APPROACH
- */
-
-exports.db = db;
+//TODO: Vedi come funziona la connesione multipla, come si istanziano più sqliteManager
+//
 
 exports.apriDB = function () {
     return new Promise(function (resolve) {
         this.db = new sqlite3.Database(db_path,
             function (err) {
                 if (err) reject("Open error: " + err.message)
-                else resolve(db_path + " aperto")
+                else resolve(db)
             }
         )
     })
 }
 
-exports.chiudiDB = function () {
+exports.chiudiDB = function (db) {
     return new Promise(function (resolve, reject) {
         this.db.close()
         resolve(true)
@@ -42,10 +39,11 @@ exports.addUser = function (id_utente, nome_utente, isAdmin = 0) {
     let query = `INSERT OR IGNORE into utenti (id_utente,nome,is_admin) 
     values (?,?,?)`
     return new Promise(function (resolve, reject) {
-        this.db.run(query, [id_utente, nome_utente, isAdmin], function (err, rows) {
+        db.run(query, [id_utente, nome_utente, isAdmin], function (err, rows) {
             if (err) {
                 reject(err.message)
             } else {
+                resolve(true)
                 console.log("Aggiunto utente " + this.lastID)
             }
         })
@@ -66,6 +64,63 @@ exports.getAllUsers = function () {
         })
     })
 }
+
+/**
+ * Ottieni tutti gli utenti attualmente abilitati nel DB
+ * @returns 
+ */
+exports.getAllAllowedUsers = function () {
+    return new Promise(function (resolve, reject) {
+        var query = `SELECT id_utente FROM utenti WHERE pending=0`
+        this.db.all(query, function (err, rows) {
+            if (err) reject("Read error: " + err.message)
+            else {
+                resolve(rows)
+            }
+        })
+    })
+}
+
+/**
+ * Ottieni tutti gli utenti attualmente in attesa di abilitazione nel DB
+ * @returns 
+ */
+exports.getAllPendingUsers = function () {
+    return new Promise(function (resolve, reject) {
+        var query = `SELECT id_utente FROM utenti WHERE pending=1`
+        this.db.all(query, function (err, rows) {
+            if (err) reject("Read error: " + err.message)
+            else {
+                resolve(rows)
+            }
+        })
+    })
+}
+/**
+ * Verifica se un utente è nel DB
+ * @returns 
+ */
+exports.getUser = function (id_utente) {
+    return new Promise(function (resolve, reject) {
+        var query = `SELECT id_utente FROM utenti WHERE id_utente=? AND pending=0`
+        this.db.all(query, [id_utente], function (err, rows) {
+            if (err) {
+                reject(false)
+                console.error("Errore nell'ottenere l'utente con questo ID " + id_utente);
+            } else {
+                if (rows.length < 1) {
+                    console.log(rows);
+                    resolve(false);
+                } else {
+                    console.log("Si ho trovato l'utente " + rows)
+                    resolve(true);
+                }
+
+            }
+        })
+    })
+}
+
 
 /**
  * Elimino dal DB un utente passando il suo id telegram

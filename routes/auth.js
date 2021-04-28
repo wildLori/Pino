@@ -28,7 +28,6 @@ router.get('/login/google', passport.authenticate("google", {
  * FINE : Se tutto va bene, l'utente può accedere alla Dashboard
  */
 router.get('/google/redirect', passport.authenticate('google'), function (req, res) {
-    //TODO: Dovrei mettere un aggiunta al DB del token dell'utente?
     res.redirect('/dashboard')
 })
 

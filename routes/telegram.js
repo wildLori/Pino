@@ -46,7 +46,7 @@ setup();
  */
 async function setup() {
   console.log(await modelManager.apriDB());
-  var utenti = await modelManager.getAllUsers();
+  var utenti = await modelManager.getAllAllowedUsers();
   areUsersLoaded = true;
   //CARICO TUTTI GLI UTENTI DAL DB AL JSON IN MEMORIA
   for (let index = 0; index < utenti.length; index++) {
@@ -55,7 +55,7 @@ async function setup() {
     console.log(utente);
   }
   //utenti.forEach((x) => console.log(x.value))
-  console.log(await modelManager.chiudiDB())
+  //console.log(await modelManager.chiudiDB())
 }
 
 
@@ -79,50 +79,89 @@ const helpMsg = `Command reference:
 /help - Show this help page
 Tip: You can also use e.g. '/inc2 5' to increase counter two by five counts.`;
 
-
-
 /*
  * 0️⃣ Configurazione del Bot Telegram
  */
 var bot = new Telegraf(process.env.BOT_TOKEN)
 
-
+//bot.use(Telegraf.log());
 bot.use(async (ctx, next) => {
+
   if (areUsersLoaded) {
     try {
-      if (ctx.from.id) { //Il messaggio arriva da un utente Telegram?
-        let id_utente = ctx.from.id;
-        if (utentiAttivi.hasOwnProperty(id_utente)) { //L'utente che ha mandato il messaggio è nella lista degli utenti attivi?
-          console.log(id_utente + " è già attivo.");
-          // STATUS : Sta inserendo un nuovo reostato?
-          if (utentiAttivi[id_utente].is_adding_new_reostato == true) { //L'utente è nello status di "Sto per aggiungere un reostato?""
-            let new_reostato = ctx.message;
-            console.log(new_reostato);
-            ctx.reply("Inserisco " + new_reostato.nome + " nel Database 🔄");
-            setIsAddingNewReostato(id_utente, false); //Aggiorno lo stato is_adding_new_reostato a false
-            await modelManager.addReostato(new_reostato).then((res) => ctx.reply("Ho aggiunto il reostato!"));
-            modelManager.chiudiDB();
-            // STATUS : Sta scegliendo un reostato?
-          } else if (utentiAttivi[id_utente].is_choosing_reostato == true) { //Se l'utente sta scegliendo il reostato
-            if (ctx.message.text != '➕ Aggiungi') {
-              let reostato_scelto = ctx.message.text;
-              let res_test = await setUltimoReostatoUsato(id_utente, reostato_scelto);
-              ctx.reply(utentiAttivi[id_utente].last_reostato_usato + ' impostato ☑', Markup.removeKeyboard().extra())
+      if (ctx) {
+        if (ctx.from.id != undefined) { //Il messaggio arriva da un utente Telegram?
+          let id_utente = ctx.from.id;
+          if (utentiAttivi.hasOwnProperty(id_utente)) { //L'utente che ha mandato il messaggio è nella lista degli utenti attivi?
+            console.log(id_utente + " è già attivo.");
+            if (utentiAttivi[id_utente].is_choosing_reostato == true) { //L'utente sta SCEGLIENDO un reostato?
+              if (ctx.message.text != '➕ Aggiungi') {
+                let reostato_scelto = ctx.message.text;
+                let res_test = await setUltimoReostatoUsato(id_utente, reostato_scelto);
+                ctx.reply(utentiAttivi[id_utente].last_reostato_usato + ' impostato ☑', Markup.removeKeyboard().extra())
+                ctx.reply('<b>Quale azione vuoi eseguire sulla foto?</b>', Extra.HTML().markup((m) =>
+                  m.inlineKeyboard([
+                    [m.callbackButton('✍ Aggiungi testo sulla foto (Default Data e ora)', 'aggiungiTesto')],
+                    [m.callbackButton('⚙️ Cambia il tipo di Reostato (Ultimo :' + reostato_scelto + ')', 'scegliReostato')],
+                    [m.callbackButton('✖ Annulla', 'annullaUpload'), m.callbackButton('⬆ Carica', 'carica')]
+                  ]).resize()))
+                await setIsChoosingReostato(id_utente, false);
+              } else {
+
+              }
             }
+            if (utentiAttivi[id_utente].is_adding_new_reostato == true) { //L'utente è nello status di "Sto per aggiungere un NUOVO reostato?"" -> Registro il messaggio
+              let new_reostato = ctx.message.text;
+              console.log(new_reostato);
+              ctx.reply("Inserisco " + new_reostato.nome + " nel Database 🔄");
+
+              setUltimoReostatoUsato(id_utente, new_reostato);
+              await modelManager.addReostato(new_reostato).then((res) => ctx.reply("Ho aggiunto il reostato!"));
+              await setIsAddingNewReostato(id_utente, false); //Aggiorno lo stato is_adding_new_reostato a false
+              ctx.reply('<b>Quale azione vuoi eseguire sulla foto?</b>', Extra.HTML().markup((m) =>
+                m.inlineKeyboard([
+                  [m.callbackButton('✍ Aggiungi testo sulla foto (Default Data e ora)', 'aggiungiTesto')],
+                  [m.callbackButton('⚙️ Cambia il tipo di Reostato (Ultimo :' + new_reostato + ')', 'scegliReostato')],
+                  [m.callbackButton('✖ Annulla', 'annullaUpload'), m.callbackButton('⬆ Carica', 'carica')]
+
+                ]).resize()))
+
+
+            } else if (utentiAttivi[id_utente].is_adding_text == true) {
+              let new_text = ctx.message.text;
+
+              ctx.reply("Inserisco " + new_text + " sulla foto 📸");
+              await setLastTestoSuImmagine(id_utente, new_text);
+              await setIsAddingText(id_utente, false);
+              ctx.reply('<b>Quale azione vuoi eseguire sulla foto?</b>', Extra.HTML().markup((m) =>
+                m.inlineKeyboard([
+                  [m.callbackButton('✍ Aggiungi testo sulla foto (Default Data e ora)', 'aggiungiTesto')],
+                  [m.callbackButton('⚙️ Cambia il tipo di Reostato (Ultimo :' + utentiAttivi[id_utente].last_reostato_usato + ')', 'scegliReostato')],
+                  [m.callbackButton('✖ Annulla', 'annullaUpload'), m.callbackButton('⬆ Carica', 'carica')]
+
+                ]).resize()))
+            }
+          } else {
+            var valido = await modelManager.getUser(id_utente);
+            if (valido) {
+              aggiungiUtenteAttivo(id_utente);
+              console.log(id_utente + " attivato ORA");
+              console.log("ID CHAT : " + ctx.from.id + "\n" + ctx.chat.id);
+              ctx.reply("Bentornato " + ctx.from.first_name + "👋");
+            } else {
+              ctx.reply("Non sei abilitato all'utilizzo del bot, ma ho fatto richiesta. Se vuoi essere sbloccato scrivi a @chiamamilori")
+            }
+
           }
-        } else {
-          aggiungiUtenteAttivo(id_utente); //Se non è attivo, aggiungo l'utente nel JSON
-          console.log(id_utente + " attivato ORA");
-          console.log("ID CHAT : " + ctx.from.id + "\n" + ctx.chat.id);
         }
       }
-    } catch (err) {
-      console.log("ERRORE?" + ctx.message);
 
-      console.log(err);
+    } catch (err) {
+
+      console.log("ERRORE" + err.StackTrace + err.toString());
+      ctx.reply("Dì a @chiamamilori di controllare la Console. 📀");
     }
   }
-
   await next();
 })
 
@@ -136,7 +175,9 @@ console.log(`${process.env.APP_URL}${process.env.BOT_PATH}`);
  */
 
 
-bot.start((ctx) => ctx.reply('Ciao!'))
+bot.start((ctx) => {
+  ctx.reply('Ciao!', Extra.HTML())
+})
 
 /**
  * 1️⃣ Configurazione dei Comandi
@@ -161,6 +202,7 @@ bot.command(comandi.lista, async (ctx) => ctx.reply(await gdrive_client.list()))
  */
 bot.on('photo', async (ctx) => {
 
+  var id_utente = ctx.from.id;
   var photos = ctx.update.message.photo;
   var telegram_file_id = photos[(photos.length - 1)].file_id; //1. Ottengo ID File
   var url_download_foto = await ctx.telegram.getFileLink(telegram_file_id); //2. Ottengo URL download
@@ -168,30 +210,37 @@ bot.on('photo', async (ctx) => {
   console.log(url_download_foto);
 
   ctx.reply('Immagine ricevuta 🖼');
-  //TODO: Questo è da inserire
-  //var res = await gdrive_client.upload(fileUrlString); //Aspetto che drive carichi l'immagine
-  //await ctx.reply(res.webViewLink);
   aggiungiUrlImmagine(ctx.from.id, fileUrlString)
 
-  let last_reostato_usato = await ottieniUltimoReostatoUsato(ctx.from.id);
+  let last_reostato_usato = await ottieniUltimoReostatoUsato(id_utente);
   if (last_reostato_usato == "") {
-    last_reostato_usato = "Nessunos"
+    last_reostato_usato = "Nessuno ora"
   }
   ctx.reply('<b>Quale azione vuoi eseguire sulla foto?</b>', Extra.HTML().markup((m) =>
     m.inlineKeyboard([
       [m.callbackButton('✍ Aggiungi testo sulla foto (Default Data e ora)', 'aggiungiTesto')],
       [m.callbackButton('⚙️ Cambia il tipo di Reostato (Ultimo :' + last_reostato_usato + ')', 'scegliReostato')],
-      [m.callbackButton('✖ Annulla', 'annullaUpload')]
+      [m.callbackButton('✖ Annulla', 'annullaUpload'), m.callbackButton('⬆ Carica', 'carica')]
     ]).resize()))
 
+  await setIsChoosingOption(id_utente, true);
 });
 
-bot.action('scegliReostato', async (ctx) => {
+/**
+ * STATUS:
+ * - IS CHOOSING OPTION
+ *  - IS CHOOSING REOSTATO
+ *  - IS ADDING REOSTATO
+ *  - IS ADDING TEXT
+ *
+ * Nel bot.use ... ogni volta controllo lo stato.
+ * Per esempio : IF(ISCHOOSINGOPTION){ IF(MESSAGE.TEXT != ...)}
+ */
 
-  await modelManager.apriDB();
+bot.action('scegliReostato', async (ctx) => {
   ctx.deleteMessage();
   let last_reostati = await modelManager.getAllReostati();
-  setIsChoosingReostato(ctx.from.id, true)
+  setIsChoosingReostato(ctx.from.id, true) //OK
   var buttons = [];
   for (let i = 0; i < last_reostati.length; i++) {
     let temp = last_reostati[i].nome;
@@ -211,45 +260,59 @@ bot.action('scegliReostato', async (ctx) => {
 
 bot.action('annullaUpload', (ctx) => {
   let id_utente = ctx.from.id;
-  setIsAddingNewReostato(id_utente, false);
-  setIsChoosingReostato(id_utente, false);
+  resetUtenteAttivo(id_utente);
   console.log(ctx.message);
-  //ctx.telegram.deleteMessage(ctx.message.chat.id, ctx.message.id);
+  ctx.deleteMessage();
 })
 
 bot.hears('➕ Aggiungi', async (ctx) => {
   let id_utente = ctx.from.id;
-  ctx.reply('Quale nome vuoi impostare?', Markup.forceReply().extra());
+  ctx.reply('Come si chiama il reostato che vuoi aggiungere?', Markup.forceReply().extra());
   setIsAddingNewReostato(id_utente, true); //Imposto il flag che l'utente attuale sta scegliendo, così il Middleware intercetterà il prossimo messaggio
 })
 
 bot.action('aggiungiTesto', async (ctx) => {
-  //🔴 TODO: Questo è solo un test, la funzione per uploadare deve essere spotata su un bottone apposito!!!!!!!
-  let file_name = "test";
-  let data = Date.now().toString();
-  let url = await ottieniUltimoLink(ctx.from.id);
-  ctx.reply(url);
-  var buffer = await imageManager.aggiungiTesto(url);
-  var res = await gdrive_client.uploadFromBuffer(file_name, buffer);
-  console.log("Upload terminato!" /*+ res*/ );
-  ctx.reply(res);
-  //await modelManager.apriDB();
-
-  //4. Carica su Drive
-
+  let id_utente = ctx.from.id;
+  ctx.reply('Cosa vuoi scrivere sulla foto?', Markup.forceReply().extra());
+  setIsAddingText(id_utente, true); //Imposto il flag che l'utente attuale sta scegliendo, così il Middleware intercetterà il prossimo messaggio
 })
+
+
 
 bot.action('carica', async (ctx) => {
   let id_utente = ctx.from.id;
-  gdrive_client.uploadFromBuffer()
+  ctx.deleteMessage();
   try {
 
-  } catch (error) {
+    let dati_for_upload = await getDatiForUpload(id_utente);
 
+    let url = dati_for_upload.last_photo_url;
+    let text = dati_for_upload.last_testo_su_immmagine;
+    let nome_file_reostato = dati_for_upload.last_reostato_usato;
+
+    if (text != nome_file_reostato == "" || nome_file_reostato == undefined) {
+      console.log("Non ho trovato il testo oppure non è stato impostato");
+      let data = new Date();
+      text = data.toLocaleDateString();
+    }
+
+    if (nome_file_reostato == "" || nome_file_reostato == undefined) {
+      console.log("Non ho trovato il nome del reostato oppure non è stato impostato");
+      nome_file_reostato = "Nuovo Reostato " + data;
+    }
+
+    var buffer = await imageManager.aggiungiTesto(url, text);
+    console.log(nome_file_reostato);
+    var res = await gdrive_client.uploadFromBuffer(nome_file_reostato, buffer);
+    console.log("Upload terminato!" /*+ res*/ );
+    ctx.reply("Immagine salvata correttamente ☑");
+  } catch (error) {
+    ctx.reply(error);
+    console.log(error.stack)
   } finally {
     resetUtenteAttivo(id_utente)
   }
-  ctx.reply("Immagine salvata correttamente ☑");
+
 
 
 })
@@ -294,6 +357,9 @@ async function resetUtenteAttivo(id_utente) {
     utentiAttivi[id_utente].last_photo_url = "";
     utentiAttivi[id_utente].to_delete_message = "";
     utentiAttivi[id_utente].is_choosing_reostato = false;
+    utentiAttivi[id_utente].is_choosing_option = false;
+    utentiAttivi[id_utente].is_adding_new_reostato = false;
+    utentiAttivi[id_utente].is_adding_text = false;
   }
 }
 
@@ -310,6 +376,8 @@ async function aggiungiUtenteAttivo(id_utente) {
     last_testo_su_immmagine: "",
     is_choosing_reostato: false,
     is_adding_new_reostato: false,
+    is_choosing_option: false,
+    is_adding_text: false,
     to_delete_message: ""
   };
   utentiAttivi[id_utente] = utente_attivo;
@@ -403,7 +471,19 @@ async function setIsAddingNewReostato(id_utente, new_State) {
 }
 
 /**
- * Imposta se l'utente sta scegliendo o meno un nuovo reostato
+ * Imposta se l'utente sta aggiungendo o meno un testo
+ * @id_utente
+ * @new_state
+ */
+async function setIsAddingText(id_utente, new_State) {
+  if (utentiAttivi.hasOwnProperty(id_utente)) {
+    utentiAttivi[id_utente].is_adding_text = new_State;
+    return true;
+  }
+}
+
+/**
+ * Imposta se l'utente sta scegliendo o meno un reostato ESISTENTE
  * @id_utente
  * @new_state
  */
@@ -414,11 +494,63 @@ async function setIsChoosingReostato(id_utente, new_State) {
   }
 }
 
+/**
+ * Imposta se l'utente sta scegliendo o meno un reostato ESISTENTE
+ * @id_utente
+ * @new_state
+ */
+async function setIsChoosingOption(id_utente, new_State) {
+  if (utentiAttivi.hasOwnProperty(id_utente)) {
+    utentiAttivi[id_utente].is_choosing_option = new_State;
+    return true;
+  }
+}
+
 async function setToDeleteMessage(id_utente, id_messaggio) {
 
 }
 
+async function getDatiForUpload(id_utente) {
+  try {
+    if (utentiAttivi.hasOwnProperty(id_utente)) {
+      var myOBJ = {
+        last_reostato_usato: "",
+        last_photo_url: "",
+        last_testo_su_immmagine: "",
+      };
+      myOBJ.last_photo_url = utentiAttivi[id_utente].last_photo_url;
+      myOBJ.last_reostato_usato = utentiAttivi[id_utente].last_reostato_usato;
+      myOBJ.last_testo_su_immmagine = utentiAttivi[id_utente].last_testo_su_immmagine;
+      return myOBJ;
+    } else {
+      throw new Error("Errore nell'ottenere i dati per l'upload");
+    }
 
+  } catch (error) {
+    console.log(error);
+  } finally {
+    console.log("Dati upload ottenuti");
+  }
+}
+
+
+/**
+ * SKU
+ */
+async function setLastTestoSuImmagine(id_utente, text) {
+  if (utentiAttivi.hasOwnProperty(id_utente)) {
+    utentiAttivi[id_utente].last_testo_su_immmagine = text;
+    return true;
+  }
+}
+
+
+//TODO:
+/**
+ * 1. Gestisci stati della tastiera.
+ * Inserisco proprietà "toDeleteMessage" nel JSON dell'utente
+ * 2. 
+ */
 
 
 

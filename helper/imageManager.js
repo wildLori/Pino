@@ -7,7 +7,7 @@
    * @testo da aggiungere all'immagine
    */
 
-  async function aggiungiTesto(url, testo = "TESTO BY LORENZO") {
+  async function aggiungiTesto(url, testo) {
     var myBuffer;
 
     const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);

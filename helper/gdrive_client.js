@@ -3,10 +3,7 @@ Google Drive API:
 IMPORTANTE! 
 Questa è solo per fare le operazioni su Drive, si agisce sull'account BelfantiFamiglia
 */
-/**
- * //TODO:
- * - 
- */
+
 const {
   google
 } = require('googleapis');
@@ -143,7 +140,7 @@ async function listFiles(param_pageSize = 10) {
        * Se è stato trovato almeno un file...
        */
       console.log('Files:');
-      files.map((file) => { //TODO: Per Telegram : invia l'oggetto file, e poi fa un file.map da telegram.
+      files.map((file) => {
         console.log(`${file.name} (${file.id})`);
       });
     } else {
