@@ -1,10 +1,13 @@
-Allora, in pratica:
-Devo separare le cose:
+Allora:
 
-Il mio Helper principale è il gDrive Client: lo richiamo ovunque con gDriveClient.upload(_file_da_inviare)
+Io voglio avere una
 
-Io voglio che il gDriveClient utilizzi un OAuth di un utente
-Come faccio?
-Nell'altro file l'omino utilizza un Access_token <----------- GUARDA QUESTO PLSs
+Dashboard
+Come accedo alla dashboard?
 
-
+Login -> 
+1. Prendo credenziali 
+2. Faccio hash delle credenziali 
+3. Cerco hash nel DB "SELECT * FROM hash WHERE TOKEN = ?"
+4. Trovo il token? SI -> Lo mando all'utente e nel suo JS, ogni volta che fa una fetch mi invia anche il token
+5. a ogni chiamata, invio il token

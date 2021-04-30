@@ -1,40 +1,60 @@
-var express = require('express')
-var passport = require('passport')
+const express = require('express');
+const router = express.Router();
+const jwt = require('jsonwebtoken');
+const modelManager = require('../helper/modelManager')
+const path = require('path');
 
-// init router for auth
-const router = express.Router()
-
-router.get('/login', function (req, res) {
-
-    if (req.user) res.redirect('/dashboard') // if auth
-    else res.redirect('/auth/login/google') // if not auth
-
+require('dotenv').config({
+    path: path.resolve(__dirname, '../private/.env')
 })
+const privateKey = process.env.JWT;
 
 /**
- * Se mi arriva /login/google vuol dire che qualcuno vuole autenticarsi con google
- * Io lo re-indirizzo alla solita paginetta bianca
- * di google per loggarsi e autorizzare
- * l'accesso a google drive + info basiche del profilo
+ * 🍎 ROUTING
  */
-router.get('/login/google', passport.authenticate("google", {
-    scope: ['profile', "https://www.googleapis.com/auth/drive.file", "email"]
-}))
 
-/**
- * Redirect dopo il login Callback che mi arriva da Google con il Token.
- * La roba che mi arriva passa attravero Passport.Google e poi sa lui come
- * entrare. (glielo ho spiegato nella classe passport.js)
- * FINE : Se tutto va bene, l'utente può accedere alla Dashboard
- */
-router.get('/google/redirect', passport.authenticate('google'), function (req, res) {
-    res.redirect('/dashboard')
+router.get('/', (req, res) => {
+    if (req)
+        res.render('login', {
+            title: "Login!"
+        })
 })
 
-// logout
-router.get('/logout', function (req, res) {
-    req.logOut();
-    res.redirect('/')
-})
+router.post('/login', async (req, res) => {
+    // read username and password from request body
+    console.log("Si ok fra mi è arrivato: " + req.body.username, req.body.pin)
+    const username = req.body.username;
+    const pin = req.body.pin;
+    if (username) {
+        if (pin) {
+            //TODO: Questa funzione deve ritornare : JSON { username, ruolo }
+            await modelManager.apriDB();
+            const user = await modelManager.getUserAndRole(username, pin);
+            modelManager.chiudiDB();
 
-module.exports = router
+            if (user) {
+                // generate an access token
+                const accessToken = jwt.sign({
+                    nome: user.nome,
+                    admin: user.is_admin
+                }, privateKey);
+
+
+                if (user.is_admin) {
+                    res.json({
+                        accessToken
+                    });
+                } else {
+                    res.json("Unauthorized");
+                }
+            }
+        } else {
+            return res.send("Erorre con il pin");
+        }
+    } else {
+        return res.send("Errore con lo Username")
+    }
+});
+
+
+module.exports = router;

@@ -24,6 +24,28 @@ exports.chiudiDB = function (db) {
     })
 }
 
+exports.getUserAndRole = function (nome, pin) {
+    return new Promise(function (resolve, reject) {
+        var query = `SELECT nome,is_admin FROM utenti WHERE nome=? AND pin=?`
+        this.db.get(query, [nome, pin], function (err, row) {
+            console.log(err, row);
+            if (err) {
+                reject(false)
+                console.error("Errore nell'ottenere l'utente con questo ID " + id_utente);
+            } else {
+                if (!row) {
+                    console.log(row);
+                    resolve(false);
+                } else {
+                    console.log("Si ho trovato l'utente " + row)
+                    resolve(row);
+                }
+
+            }
+        })
+    })
+}
+
 /**
  * 👤 USER MANAGER 👤
  */
