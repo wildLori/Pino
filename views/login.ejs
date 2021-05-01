@@ -1,81 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
-  <title>Login!</title>
-  <link rel="stylesheet" href="/stylesheets/boot.css">
-  <link rel="stylesheet" href="/stylesheets/login.css">
+    <title>Node Authentication</title>
+    <link rel="stylesheet" href="/stylesheets/boot.css">
+    <link rel="stylesheet" href="/stylesheets/login.css">
+
 </head>
 
-<body class="text-center">
-  <form class="form-signin">
-    <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt="" width="72"
-      height="72">
-    <h1 class="h3 mb-3 font-weight-normal">Bentornato 👋</h1>
-    <label for="inputUsername" class="sr-only">Username</label>
-    <input type="username" id="inputUsername" class="form-control" placeholder="Username" required="" autofocus="">
-    <label for="inputPin" class="sr-only">PIN</label>
-    <input type="password" id="inputPIN" class="form-control" placeholder="PIN" required="">
-    <button class="btn btn-lg btn-primary btn-block" type="submit" onclick="login()">Login</button>
-  </form>
+<body>
+    <div class="text-center">
+
+        <h1><span class="fa fa-sign-in"></span>Bentornato 👋</h1>
+
+        <!-- LOGIN FORM -->
+        <form id="myForm">
+            <div class="form-signin">
+                <input id="txt_username" type="text" class="form-control" placeholder="Username" name="username">
+                <p></p>
+                <input id="txt_pin" type="password" class="form-control" placeholder="PIN" name="pin">
+                <button id="btn_login" class="btn btn-lg btn-primary btn-block">Login</button>
+            </div>
+            <button id="changeAdmin" onclick="alert(localStorage.getItem('jwt'))"
+                class="btn btn-lg btn-secondary btn-block">Entra ➡</button>
+
+        </form>
+        <hr>
+    </div>
 </body>
 
 </html>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
-  async function login() {
+    $(document).ready(function () { // Wait until document is fully parsed
+        $("#myForm").on('submit', function (e) {
+            e.preventDefault();
+            var getUsername = $('#txt_username').val();
+            var getPIN = $('#txt_pin').val();
+            makeRequest(getUsername, getPIN);
 
-    let username = await document.getElementById("inputUsername").value;
-    let pin = await document.getElementById("inputPIN").value;
+        });
+    })
 
-    console.log("Cosa ho ottenuto ???" + username + pin);
+    function makeRequest(username, pin) {
+        var form = new FormData();
+        form.append("username", username);
+        form.append("pin", pin);
 
-    try {
-      var formdata = new FormData();
-      formdata.append("username", username);
-      formdata.append("pin", pin);
+        var settings_LOGIN = {
+            "url": "https://belfanti.ddns.net:8443/auth/login",
+            "method": "POST",
+            "timeout": 0,
+            "processData": false,
+            "mimeType": "multipart/form-data",
+            "contentType": false,
+            "data": form
+        };
 
-      var requestOptions = {
-        method: 'POST',
-        body: formdata,
-        redirect: 'follow'
-      };
+        var settings_OFFICINA = {
+            "url": "https://belfanti.ddns.net:8443/officina",
+            "method": "GET",
+            "timeout": 0,
+            "xhrFields": {
+                "withCredentials": true
+            }
+        };
 
-      fetch("https://belfanti.ddns.net:8443/auth/login", requestOptions)
-        .then(response => response.text())
-        .then(result => alert(result))
-        .catch(error => console.log('error', error));
-    } catch (error) {
-      console.log(error)
+        $.ajax(settings_LOGIN).done(function (response) {
+            var json_data = response
+            location.href = "https://belfanti.ddns.net:8443/officina"
+            if (json_data.error) {
+                alert("Errore! " + json_data.error)
+            } else {
+
+            }
+
+
+        });
     }
-    /*
-        fetch("/auth/login", {
-          method: 'POST',
-          body: JSON.stringify({
-            username: username,
-            pin: pin
-          }),
-          credentials: 'include',
-        }).then(function (response) {
-          return response.json();
-        }).then(function (result) {
-          console.log(result);
-          if (result.auth === true) {
-            let jwt = result.accessToken;
-            // set token in cookie
-            localStorage.setItem('jwt', jwt);
-            fetch(url, {
-              headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('jwt')
-              },
-              method: 'GET',
-              cache: false
-            }).then(function (response, err) {
-              // Receive API response
-              console.log(response, err)
-              var res = err || response
-            })
-          }
-        })*/
-  }
 </script>
