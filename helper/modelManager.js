@@ -73,11 +73,11 @@ exports.addUser = function (id_utente, nome_utente, isAdmin = 0) {
 }
 /**
  * Ottieni tutti gli utenti attualmente registrati nel DB
- * @returns 
+ * @returns rows
  */
 exports.getAllUsers = function () {
     return new Promise(function (resolve, reject) {
-        var query = `SELECT id_utente FROM utenti`
+        var query = `SELECT id_utente,nome,pending FROM utenti`
         this.db.all(query, function (err, rows) {
             if (err) reject("Read error: " + err.message)
             else {

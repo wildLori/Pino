@@ -1,0 +1,45 @@
+html,
+body {
+    height: 100%;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 0.5fr 2fr 0.5fr;
+    grid-template-rows: 1.8fr;
+    gap: 0px 0px;
+    grid-template-areas:
+        ". . ."
+        ". container ."
+        ". . .";
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 10% 10% 2fr;
+    gap: 0px 0px;
+    grid-template-areas:
+        "navbar-container navbar-container navbar-container"
+        "button-container button-container button-container"
+        "table-container table-container table-container";
+    grid-area: container;
+}
+
+.button-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 10% 0px;
+    grid-template-areas:
+        ". . .";
+    grid-area: button-container;
+}
+
+.navbar-container {
+    grid-area: navbar-container;
+}
+
+.table-container {
+    grid-area: table-container;
+}

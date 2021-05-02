@@ -9,12 +9,13 @@ const {
 require('dotenv').config({
     path: path.resolve(__dirname, '../private/.env')
 })
+const modelManager = require('../helper/modelManager');
 const privateKey = process.env.JWT;
 
 router.use(cookieParser());
 const authenticateJWT = (req, res, next) => {
     console.log("Entro in officina");
-    // const authHeader = req.headers.authorization;
+
     var login_cookie = req.cookies.jwt;
     if (login_cookie === undefined) {
         res.redirect("/auth");
@@ -36,10 +37,19 @@ const authenticateJWT = (req, res, next) => {
 /**
  * 🔨 ROUTING
  */
-router.get('/', authenticateJWT, function (req, res) {
+router.get('/', authenticateJWT, async function (req, res) {
     if (req) {
         console.log("SKU, ora ti renderizzo la officina");
-        res.render('officina')
+        //Apro il DB
+        //Query per ottenere tutti gli utenti
+        //Chiudo il DB
+        await modelManager.apriDB();
+        const users = await modelManager.getAllUsers();
+        await modelManager.chiudiDB();
+        console.log(users);
+        res.render('officina', {
+            info: users
+        })
     }
 
 })
