@@ -43,15 +43,23 @@ router.get('/', authenticateJWT, async function (req, res) {
         //Apro il DB
         //Query per ottenere tutti gli utenti
         //Chiudo il DB
-        await modelManager.apriDB();
+        // await modelManager.apriDB();
         const users = await modelManager.getAllUsers();
-        await modelManager.chiudiDB();
+        // await modelManager.chiudiDB();
         console.log(users);
         res.render('officina', {
             info: users
         })
     }
 
+})
+
+router.get('/accettaUtente', authenticateJWT, async function (req, res) {
+
+    console.log(req.query.id_utente + req.query.new_state);
+    await modelManager.setUserAcceptance(req.query.id_utente, req.query.new_state)
+    console.log("Ok ho aggiornato l'utente");
+    return res.sendStatus(200);
 })
 
 

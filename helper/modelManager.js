@@ -143,7 +143,17 @@ exports.getUser = function (id_utente) {
     })
 }
 
-
+exports.setUserAcceptance = function (utente, new_state) {
+    return new Promise(function (resolve, reject) {
+        var query = `UPDATE utenti SET pending=? WHERE id_utente=?`
+        this.db.run(query, [new_state, utente], function (err, res) {
+            if (err) reject("Errore nell'update di " + utente)
+            else {
+                resolve(true)
+            }
+        })
+    })
+}
 /**
  * Elimino dal DB un utente passando il suo id telegram
  * @param {*} utente_da_eliminare 

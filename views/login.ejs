@@ -10,9 +10,11 @@
 
 <body>
     <div class="text-center">
-
+        <img src="/images/logo.svg" width="120" height="120" class="d-inline-block align-top" alt="">
         <h1><span class="fa fa-sign-in"></span>Bentornato 👋</h1>
-
+        <p><span>Chiedi a <a href="https://www.telegram.me/chiamamilori">@chiamamilori</a>
+                per
+                avere credenziali.</span></p>
         <!-- LOGIN FORM -->
         <form id="myForm">
             <div class="form-signin">
@@ -31,9 +33,9 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
-    $(document).ready(function () { // Wait until document is fully parsed
+    $(document).ready(function () { // Questa è una modifica all'evento "submit" del form
         $("#myForm").on('submit', function (e) {
-            e.preventDefault();
+            e.preventDefault(); //Così evito che esegua il suo comportamento predefinito
             var getUsername = $('#txt_username').val();
             var getPIN = $('#txt_pin').val();
             makeRequest(getUsername, getPIN);

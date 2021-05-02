@@ -10,6 +10,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var fileUpload = require('express-fileupload')
+var favicon = require('serve-favicon');
 
 /**
  * Route
@@ -38,11 +39,15 @@ app.use(express.urlencoded({
   extended: true
 }));
 app.use(fileUpload())
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
 
 app.use('/auth', auth)
 app.use('/officina', officina)
 app.use(telegramManager); //la route corrispondente è gestita nel module.export() in Telegram.js
 
+app.get('/', function (req, res) {
+  res.redirect('/auth');
+})
 
 /**
  * Gestione e visualizzazione errori

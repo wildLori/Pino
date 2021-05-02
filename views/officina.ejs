@@ -1,5 +1,5 @@
-<link rel="stylesheet" href="../public/stylesheets/officina.css">
-<link rel="stylesheet" href="../public/stylesheets/boot.css">
+<!--<link rel="stylesheet" href="../public/stylesheets/officina.css">
+<link rel="stylesheet" href="../public/stylesheets/boot.css"> -->
 <link rel="stylesheet" href="/stylesheets/boot.css">
 <link rel="stylesheet" href="/stylesheets/officina.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -9,39 +9,39 @@
 <body>
     <div class="grid-container">
         <div class="container">
+            <!-- Image and text -->
+            <nav class="navbar navbar-light ">
+                <a class="navbar-brand" href="#">
+                    <img src="/images/logo.svg" width="40" height="40" class="d-inline-block align-top text-light"
+                        alt="">
+                    Gestione e accettazione utenti
+                </a>
+            </nav>
+
             <div class="button-container"></div>
-            <div class="navbar-container"></div>
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">ID</th>
                             <th scope="col">Nome</th>
                             <th scope="col">In attesa?</th>
-                            <th scope="col">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row"></th>
-                            <td>id_utente</td>
-                            <td>nome</td>
-                            <td>Sì</td>
-                            <td><button class="btn btn-outline-primary">Accetta</button>
-                                <button class="btn ">Rifiuta</button></td>
-                        </tr>
                         <% for(var i=0; i<info.length; i++) {%>
                         <tr>
-                            <th scope="row"></th>
+
                             <td><%= info[i].id_utente %></td>
                             <td><%= info[i].nome %></td>
-                            <td><%= info[i].pending%> </td>
+                            <%if (info[i].pending != 0) { %>
                             <td><button class="btn btn-outline-primary"
-                                    onclick="accettaUtente('<%= info[i].id_utente%>','<%= info[i].nome %>',1)">Accetta</button>
+                                    onclick="accettaUtente('<%= info[i].id_utente%>',0)">Accetta</button>
                                 <button class="btn"
-                                    onclick="accettaUtente('<%= info[i].id_utente%>','<%= info[i].nome %>',0)">Rifiuta</button>
+                                    onclick="accettaUtente('<%= info[i].id_utente%>',1)">Rifiuta</button>
                             </td>
+                            <% } %>
+
                         </tr>
                         <% } %>
                     </tbody>
@@ -54,7 +54,23 @@
 </body>
 
 <script>
-    function accettaUtente(id_utente, nome, new_state) {
-        alert(id_utente + nome + new_state)
+    function accettaUtente(id_utente, new_state) {
+        $.ajax({
+            url: "https://belfanti.ddns.net:8443/officina/accettaUtente",
+            type: "GET", //send it through get method
+            data: {
+                id_utente: id_utente,
+                new_state: new_state
+            },
+            success: function (response) {
+                alert(id_utente + " " + new_state)
+            },
+            error: function (xhr) {
+                console.log("errore" + xhr)
+                alert("Errore")
+                //Do Something to handle error
+            }
+        });
+
     }
 </script>

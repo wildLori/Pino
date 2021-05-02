@@ -39,9 +39,9 @@ router.post('/login', async (req, res) => {
     const pin = req.body.pin;
     if (username != "" && pin != "") {
         //TODO: Questa funzione deve ritornare : JSON { username, ruolo }
-        await modelManager.apriDB();
+        // await modelManager.apriDB();
         const user = await modelManager.getUserAndRole(username, pin);
-        await modelManager.chiudiDB();
+        // await modelManager.chiudiDB();
 
         if (user) {
             console.log("Si fra c'è lo user");
