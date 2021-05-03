@@ -18,7 +18,7 @@ var favicon = require('serve-favicon');
 var telegramManager = require('./routes/telegram');
 var officina = require('./routes/officina');
 var auth = require('./routes/auth');
-
+var cli = require('./routes/cli');
 
 var app = express();
 
@@ -43,6 +43,7 @@ app.use(favicon(__dirname + '/public/images/favicon.ico'));
 
 app.use('/auth', auth)
 app.use('/officina', officina)
+app.use('/cli', cli)
 app.use(telegramManager); //la route corrispondente è gestita nel module.export() in Telegram.js
 
 app.get('/', function (req, res) {

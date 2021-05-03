@@ -38,7 +38,7 @@ const comandi = {
 
 
 var utentiAttivi = {};
-
+var pendingUsers = [];
 setup();
 
 /**
@@ -47,12 +47,19 @@ setup();
 async function setup() {
   console.log(await modelManager.apriDB());
   var utenti = await modelManager.getAllAllowedUsers();
+  var pending = await modelManager.getAllPendingUsers();
   areUsersLoaded = true;
   //CARICO TUTTI GLI UTENTI DAL DB AL JSON IN MEMORIA
   for (let index = 0; index < utenti.length; index++) {
     let utente = utenti[index].id_utente
     aggiungiUtenteAttivo(utente);
     console.log(utente);
+  }
+
+  //Ottengo la lista di chi è in attesa, così da evitarlo subito
+  for (let index = 0; index < pending.length; index++) {
+    console.log(pending[index])
+    pendingUsers.push(pending[index].id_utente);
   }
   //utenti.forEach((x) => console.log(x.value))
   //console.log(await modelManager.chiudiDB())
@@ -129,7 +136,17 @@ bot.use(async (ctx, next) => {
               console.log("ID CHAT : " + ctx.from.id + "\n" + ctx.chat.id);
               ctx.reply("Bentornato " + ctx.from.first_name + "👋");
             } else {
-              ctx.reply("Non sei abilitato all'utilizzo del bot, ma ho fatto richiesta. Se vuoi essere sbloccato scrivi a @chiamamilori")
+              console.log("Utenti pendenti" + pendingUsers);
+              if (pendingUsers.includes(id_utente)) {
+                ctx.reply("Ho già richiesto la tua aggiunta. Attendi. 🔄")
+                return;
+              } else {
+                await modelManager.addUser(id_utente, ctx.from.first_name, 0);
+                pendingUsers.push(includes)
+                ctx.reply("Non sei abilitato all'utilizzo del bot. Se vuoi essere sbloccato scrivi a @chiamamilori")
+                return;
+              }
+
             }
 
           }
@@ -269,10 +286,10 @@ bot.action('carica', async (ctx) => {
     let url = dati_for_upload.last_photo_url;
     let text = dati_for_upload.last_testo_su_immmagine;
     let nome_file_reostato = dati_for_upload.last_reostato_usato;
+    let data = new Date();
 
     if (text != nome_file_reostato == "" || nome_file_reostato == undefined) {
       console.log("Non ho trovato il testo oppure non è stato impostato");
-      let data = new Date();
       text = data.toLocaleDateString();
     }
 

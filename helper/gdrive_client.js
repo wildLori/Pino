@@ -111,43 +111,47 @@ async function uploadFromBuffer(nome_file, buffer) {
   })).data
 }
 
-async function listFiles(param_pageSize = 10) {
-  driveAuth.setCredentials({
-    refresh_token: REFRESH_TOKEN
-  })
-  const drive = await google.drive({
-    version: 'v3',
-    auth: driveAuth
-  });
+async function listFiles(dataUTC) {
+  return new Promise(async function (resolve, reject) {
+    driveAuth.setCredentials({
+      refresh_token: REFRESH_TOKEN
+    })
+    const drive = await google.drive({
+      version: 'v3',
+      auth: driveAuth
+    });
 
-  //Richiedo lista
-  /**
-   * @param 1: Parametri
-   * @param 2: Callback
-   */
-  drive.files.list({
-    pageSize: param_pageSize, //Numero di items da mostrare
-    fields: 'nextPageToken, files(id, name)',
-  }, (err, res) => {
-    /**
-     * Callback
-     */
-    if (err) return console.log('The API returned an error: ' + err);
-
-    const files = res.data.files;
-    if (files.length) {
+    console.log(dataUTC);
+    //Richiedo lista
+    drive.files.list({
+      folderId: folderUrl,
+      fields: "files/webContentLink",
+      //q: "modifiedTime > '" + dataUTC + ''
+      q: `modifiedTime > '${dataUTC}'`
+    }, (err, res) => {
       /**
-       * Se è stato trovato almeno un file...
+       * Callback
        */
-      console.log('Files:');
-      files.map((file) => {
-        console.log(`${file.name} (${file.id})`);
-      });
-    } else {
-      console.log('No files found.');
-    }
-    return (files);
-  });
+      if (err) return console.log(dataUTC + ' The API returned an error: ' + err);
+      var arr_file = [];
+      const files = res.data.files;
+      if (files.length) {
+        /**
+         * Se è stato trovato almeno un file...
+         */
+
+        console.log('Files:');
+        files.map((file) => {
+          console.log(file);
+          arr_file.push(file.webContentLink);
+        });
+      } else {
+        console.log('No files found.');
+      }
+      resolve(arr_file);
+    });
+  })
+
 }
 
 
@@ -164,7 +168,8 @@ async function deleteFile(file_id) {
 
 
 module.exports = {
-  upload: uploadFile,
+  uplo: uploadFile,
   list: listFiles,
-  uploadFromBuffer: uploadFromBuffer
+  uploadFromBuffer: uploadFromBuffer,
+  listFiles: listFiles
 }

@@ -202,3 +202,11 @@ exports.getAllReostati = function () {
         })
     })
 }
+
+/*
+exports.getLastAddedImages = function (last_data) {
+    let query = `SELECT nome link FROM `
+    return new Promise(function (resolve, reject) {
+        this.db.all(query, [last_data])
+    })
+}*/
