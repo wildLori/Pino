@@ -13,6 +13,6 @@ router.get('/', async function (req, res) {
 
     var last_images = await gDriveClient.listFiles(last_data);
 
-    return res.send(last_images);
+    return res.json(last_images);
 })
 module.exports = router;

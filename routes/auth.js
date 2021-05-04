@@ -58,7 +58,8 @@ router.post('/login', async (req, res) => {
             res.cookie('jwt', accessToken, {
                 httpOnly: true
             });
-            res.redirect(302, 'https://belfanti.ddns.net:8443/officina') // Front-End App
+            res.send(200);
+            //res.redirect(302, 'https://belfanti.ddns.net:8443/officina') // Front-End App
             // res.json({
             //     accessToken
             // });
