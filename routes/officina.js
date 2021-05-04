@@ -39,11 +39,7 @@ const authenticateJWT = (req, res, next) => {
  */
 router.get('/', authenticateJWT, async function (req, res) {
     if (req) {
-        console.log("SKU, ora ti renderizzo la officina");
-        //Apro il DB
-        //Query per ottenere tutti gli utenti
-        //Chiudo il DB
-        // await modelManager.apriDB();
+        console.log("ora renderizzo la officina");
         const users = await modelManager.getAllUsers();
         // await modelManager.chiudiDB();
         console.log(users);

@@ -1,376 +1,235 @@
-# Documentazione Bot Telegram.
+# Documentazione Progetto Sistemi + Bot Telegram
 
 Ho deciso di creare un sistema che sfruttasse **Telegram** per semplificare il lavoro di organizzazione e sincronizzazione di immagini svolto da mio padre in azienda.
-I suoi requisiti sono quelli di avere un sistema pratico e veloce che possa **classificare** ed eventualmente **aggiungere annotazioni** su **immagini**, e averle direttamente sul suo computer aziendale in una **specifica cartella.**
+I suoi requisiti sono quelli di avere un sistema pratico e veloce che possa **classificare** ed eventualmente **aggiungere annotazioni** su **immagini**, per poi averle direttamente sul suo computer aziendale in una **specifica cartella.**
+
+> La documentazione vuole comprendere tutte le tre materie di informatica, sistemi, e tpsit
 
 ## Indice
+
 [TOC]
+
+# Contesto
+
+Con la seguente si introduce 
 
 # Stack tecnologie
 
-### Strumenti 📏
+- 
 
-- **DATABASE** : Sqlite 
-- **RUNTIME** : Node.js
-- **FRAMEWORK PRINCIPALE** :  Express.js
-- **TEMPLATE ENGINE** : Ejs
+# Struttura Progetto
+
+### Attori Software
+
+#### Stack Tecnologie Software
+
+- **DATABASE** : *Sqlite* 
+- **RUNTIME** : *Node.js*
+- **FRAMEWORK PRINCIPALE** :  *Express.js*
+- **TEMPLATE ENGINE** : *Ejs*
 
 Altre tecnologie :
 
-- **CLOUD STORAGE** : Google Drive API
-- **CLOUD AUTH** : OAuth
-- **AUTHENTICATION** : JWT
-- **TELEGRAM API :** Telegraf.js
+- **WEBHOOK :** *DynDNS (No-IP) + SSL (Let's Encrypt)*
+- **CLOUD STORAGE** : *Google Drive API*
+- **CLOUD AUTH** : *OAuth*
+- **AUTHENTICATION** : *JWT*
+- **TELEGRAM API :** *Telegraf.js*
+- **CHIAMATE HTTP DA CLI :** *Axios*
+- **CHIAMATE HTTP DA WEB:** *AJAX (jQuery)*
+
+> *Cito Axios perchè utilizzato esplicitamente nella CLI.*
+> *Probabilmente compare già come dipendenza da parte di altre librerie che effettuano chiamate HTTP*
+
+### Attori Hardware
+
+Gli attori Hardware sono i componenti fisici direttamente coinvolti nella struttura del progetto.
+
+- ROUTER CASALINGO
+- 
+
+#### Stack Tecnologie Hardware
+
+- OS SERVER : Raspbian ARM 32-bit
+- 
 
 
 
-# Attori Software
+Il progetto parte dalla convenzione di progetti **node basati su Express.**
+L'entry point è nella cartella `📂www/bin`
 
-I componenti con cui interfacciarsi al sistema sono 3:
+| ![image-20210504101510003](image-20210504101510003.png) | ![image-20210504101537364](image-20210504101537364.png) | ![image-20210504101555127](image-20210504101555127.png) | ![image-20210504101618809](image-20210504101618809.png) | ![image-20210504101656776](image-20210504101656776.png) |
+| ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- |
+| Route                                                   | Views                                                   | Helper Class                                            | Private Data                                            | Public Data                                             |
 
-- Telegram BOT (Telegraf)
-- SitoWeb
-- CLI
+### Creazione Server HTTPS
+
+Il server funziona in HTTPS.
+La chiave e il certificato sono salvati nella cartella ​📁​`private/`
+
+- **Fullchain.pem** 
+
+  > Fullchain.pem contiene sia la certificazione del server che la certificazione dell'ente che lo rilascia 
+
+- **Privkey.pem**
+
+```js
+//www/bin
+
+/**
+ * Dotenv : porta del server + chiavi SSL
+ */
+
+require('dotenv').config({ path: path.resolve(__dirname, '../private/.env') })
+var certificatePath = path.resolve(__dirname,'../private/fullchain.pem');  //SSL - Related
+var privateKeyPath = path.resolve(__dirname,'../private/privkey.pem');
+var port = process.env.PORT;
+
+app.set('port', port);
+
+/**
+ * Istanzia server HTTPS con Node
+ */
+
+var server = https.createServer({
+  key: fs.readFileSync(privateKeyPath),
+  cert: fs.readFileSync(certificatePath)
+}, app)
+.listen(port, function () {
+console.log(`Attiva sulla porta ${port}!)
+})
+
+server.on('error', onError);
+server.on('listening', onListening);
+```
+
+
+
+## Route
+
+Le route sono gestite in **app.js **
+
+```js
+//app.js - Gestione delle rotte
+app.use('/auth', auth)
+app.use('/officina', officina)
+app.use('/cli', cli)
+app.use(telegramManager); //la route corrispondente è gestita nel module.export() in Telegram.js
+```
+
+
+
+### /Auth e /Officina
+
+### JWT
+
+Ogni chiamata effettuata in questa sezione utilizza il JWT come middleware. 
+
+1. CLIENT : Utente **effettua il login /auth**
+
+2. SERVER : Controlla le **credenziali**
+
+3. SERVER : Credenziali corrette. Genera un **Token JWT** che incapsula:
+
+   ```js
+   //Token JWT - Cosa incapsula?
+   {
+   	id_utente : {int32bit},
+   	is_admin : {binary}
+   }
+   ```
+
+4. SERVER : Genera un **cookie** in cui incapsulare il JWT
+
+5. SERVER : Invia un **redirect** (302) alla pagina */officina* 
+
+### EJS
+
+```js
+//app.js - settaggio del template engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+```
+
+Ejs è il **template engine** che permette di eseguire il **rendering delle pagine HTML** sfruttando la logica **embedded** direttamente nella pagina.
+L'esempio qui sotto esegue il riempimento di una tabella senza utilizzare codice javascript esterno.
+
+```ejs
+//Inserimento di una tabella nell'HTML con EJS
+<% for(var i=0; i<info.length; i++) {%>
+                        <tr>
+
+                            <td><%= info[i].id_utente %></td>
+                            <td><%= info[i].nome %></td>
+                            <%if (info[i].pending != 0) { %>
+                            <td><button class="btn btn-outline-primary"
+                                    onclick="accettaUtente('<%= info[i].id_utente%>',0)">Accetta</button>
+                                <button class="btn"
+                                    onclick="accettaUtente('<%= info[i].id_utente%>',1)">Rifiuta</button>
+                            </td>
+                            <% } %>
+
+                        </tr>
+                        <% } %>
+```
+
+> La pagina viene renderizzata lato server con la funzione `res.render(pagina,parametro)`	
+
+
 
 ## Telegram BOT
 
 Il bot di Telegram è costruito con la libreria **Telegraf**.
 
-Il bot **non utilizza il polling**, bensì utilizza un **Webhook** che punta a un **DynDNS** (Vedi paragrafo di Sistemi per approfondimenti).
+Il bot **non utilizza il polling**, bensì utilizza un **Webhook** che punta a un **DynDNS** *(Vedi paragrafo di Sistemi per approfondimenti).*
 L'utilizzo di Webhook, in relazione al compito e all'infrastruttura del bot, è stata la scelta migliore per risparmiare chiamate HTTP superflue.
-
-
-
-L'applicazione presenta le seguenti funzionalità:
-
-1. Stampa testo su **Immagine** 🀄
-2. Creazione e Impostazione Tags 📑
-3. Caricamento immagini 
-
-Il bot funziona interamente con **inline-keyboard**, così da semplificare l'esperienza di utilizzo per l'utente.
 
 ### Funzionalità
 
-Il bot di Telegram espone le seguenti funzionalità:
+Il bot presenta le seguenti funzionalità:
 
-- GESTIONE **UTENTI AUTORIZZATI** 
-- **STAMPA TESTO** SU IMMAGINE
-- CREAZIONE E IMPOSTAZIONE DI **TAG** 
-- SALVATAGGIO IMMAGINI IN **CLOUD** GOOGLE DRIVE
+1. Stampa testo su **Immagine** 🀄
+2. **Creazione** e **Impostazione Tags** 📑
+3. Caricamento immagini 🔼
 
+Il bot funziona interamente con **inline-keyboard**, così da semplificare l'esperienza di utilizzo per l'utente.
 
 
-### Navigazione 🧭
 
-La navigazione
+#### Cambio e creazione tag ⚙️
 
-Per intenderci, di seguito un esempio.
+Il secondo elemento della Tastiera permette di creare e associare un nome/tag al **Reostato** (immagine appena caricata.)
 
-```
-http://127.0.0.1:5500/#0 -> Animazione Iniziale 
-http://127.0.0.1:5500/#1 -> Scelta Colore
-http://127.0.0.1:5500/#2 -> Scelta Orientamento Schermo
-http://127.0.0.1:5500/#3 -> Galleria Immagini
-```
+![image-20210504094829412](image-20210504094829412.png)
 
-> Il contenuto dell'HTML viene cambiato dinamicamente in base alla location.hash
+Per **mantenere la consistenza** è possibile:
 
+- **Creare nuovi** Tag Reostati ➕
+- **Ri-utilizzare** Tag esistenti 🔁
 
+![image-20210504095057749](image-20210504095057749.png)
 
-# Funzionalità
 
-3. 
 
-### Inserimento testo su Immagine 🎨
+#### Stampa Testo ⚙️
 
-```
-http://127.0.0.1:5500/#1 -> Scelta Colore
-```
+![image-20210504094744446](image-20210504094744446.png)
 
-L'applicazione permette la generazione randomica di colori.
-Ogni colore generato viene applicato al tema della pagina tramite variabile CSS.
 
-![Inizio Schermata Generazione Colore](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/image-20201208171000855.png)
 
-Il colore può essere copiato in memoria con il click. [Vedi Codice per funzione di copia automatica]
+#### Upload ⚙️
 
-![Copia Colore](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/image-20201208171236893.png)
 
-Il cambio di colore è dato da due funzioni:
 
 
 
-### Classificazione Tag Reostati
+# CLI
 
-```
-http://127.0.0.1:5500/#2 -> Scelta Orientamento Schermo
-```
+Flow della CLI
 
-La seconda schermata permette di scegliere il dispositivo per il quale cercare sfondi. Essenzialmente, questo permette di filtrare per sfondi **Landscape** (rapporto larghezza/altezza > 1) o sfondi **Portrait** (rapporto larghezza/altezza < 1). 
 
-![image-20201208215035846](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/sceglidispositivo.png)
 
-### Ricerca 🔎
 
-```
-http://127.0.0.1:5500/#3 -> Durante il caricamento della terza sezione avviene la ricerca
-```
-
-Le precedenti scelte vanno ad aggiornare un JSON `Scelte`.
-
-```json
-var scelte = {
-	keyword: "PAROLA PER RICERCA"
-    colore: "#CODICE_ESADECIMALE_DEL_COLORE",
-    orientation: "LANDSCAPE / PORTRAIT"
-};
-```
-
-Questi parametri sono quelli che utilizzo personalmente al momento per 
-
-#### Query ⚙️
-
-La Stringa di Query che si crea, accetta i seguenti parametri.
-
-```
- 🔐 API KEY (obbligatorio) 	
-```
-
-> La API_KEY è univoca e personale. Viene fornita registrandosi alle API di Pexels.
-> La API_KEY viene mandata nell'Header ogni volta che si effettua una richiesta.
-
-```
-🔖 KEYWORD (obbligatorio) :
-```
-
-> La Keyword predefinita è "Wallpaper". L'API richiede questo parametro obbligatoriamente.
-
-```
-🎨 COLORE (opzionale) : 
-```
-
-> Il colore è un parametro opzionale per l'API.
-> Va inserito nel formato esadecimale #AABBCC senza l'Hashtag.
-
-```
-🔁 ORIENTAMENTO (opzionale):	
-```
-
-> L'orientamento è un parametro opzionale per l'API.
-> Accetta come parametri le parole `landscape` (orizzontale) o `portrait` (verticale).
-
-```
-💯 QUANTITA IMMAGINI (opzionale, default = 15)
-```
-
-> La quantità di immagini returnate da ogni richiesta è un parmetro opzionale per l'API.
-> Per permettere di navigare tra un numero sufficiente di immagini prima di eseguire una nuova richiesta all'API, utilizzo 15 immagini di default, in accordo con la documentazione dell'API.
-
-#### Chiamata Ajax ⚙️
-
-Sulla base dei parametri precedenti, viene effettuata una chiamata AJAX verso l'API di Pexels.
-
-```javascript
-function getQuery(keyword, verso, colore, next) {
-    var testo = keyword;
-    var mUrl;
-    var mColore = colore.substr(1); //Colore senza "#"
-	var testo = "wallpaper";
-    
-    mUrl = "https://api.pexels.com/v1/search?query=" + testo + "&color=" + mColore 			+ "&orientation=" + verso + "&per_page=15";
-        //Creo richiesta GET asincrona [ AJAX ]
-    $.ajax({
-    	//Parametro 1: Tipo Richiesta
-        method: 'GET',
-        //Parametro 2: Inserisco nell'Header la CHIAVE DELL'API
-        beforeSend: function(xhr) {
-			xhr.setRequestHeader("Authorization", API_KEY);
-        },
-		//Parametro 3: URL
-		url: mUrl,
-        //Parametro 4 e 5: Callback Successo e Errore
-        success: function(risposta) {
-			mostrarispostaJSON(risposta);
-            $("#immagineAttiva").fadeTo(400, 1.0)
-        },
-        error: function(errore) {
-			console.log(errore);
-		}
-	});
-```
-
-#### Risposta API ⚙️
-
-L'elaborazione della richiesta avviene Lato-Server dall'API. Di seguito un esempio di risposta dal Server
-
-```json
-{
-  "id": 2014422,
-  "width": 3024,
-  "height": 3024,
-  "url": "https://www.pexels.com/photo/brown-rocks-during-golden-hour-2014422/",
-  "photographer": "Joey Farina",
-  "photographer_url": "https://www.pexels.com/@joey",
-  "photographer_id": 680589,
-  "src": {
-    "original": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg",
-    "large2x": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?				auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    "large": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?				auto=compress&cs=tinysrgb&h=650&w=940",
-    "medium": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?				auto=compress&cs=tinysrgb&h=350",
-    "small": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?				auto=compress&cs=tinysrgb&h=130",
-    "portrait": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?			auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
-    "landscape": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?			auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    "tiny": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?				auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280"
-  }
-}
-```
-
-Per semplicità, i parametri da me considerati sono i seguenti:
-
-- Fotografo e URL del Fotografo
-- Link alla versione originale, large e medium dell'immagine.
-
-```json
-{
-  "photographer": "NOME_FOTOGRAFO",
-  "photographer_url": "https://www.pexels.com/@NOME_FOTOGRAFO",
-  "src": {
-    "original": "https://images.pexels.com/photos/ID_FOTO/FOTO.JPEG",
-    "large": "https://images.pexels.com/photos/ID_FOTO/FOTO.JPEG?								auto=compress&cs=tinysrgb&h=650&w=940",
-    "medium": "https://images.pexels.com/photos/ID_FOTO/FOTO.JPEG?								auto=compress&cs=tinysrgb&h=350",
-  }
-}
-```
-
-L'interazione Client-API è quindi così riassunta:
-
-<img src=".\assets\screen\Diagramma.svg" style="zoom:75%;" />
-
-
-
-### Visualizzazione Risultati 👁‍🗨
-
-#### Anteprima ⚙️
-
-Le immagini ottenute vengono visualizzate con una grande anteprima in alto e al centro dello schermo.
-Lo scorrimento avviene attraverso lo spostamento nell'Index.
-
-![image-20201208224718163](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/anteprima.png)
-
-Questa prima immagine viene mostrata estraendo i dati dal JSON.
-
-```javascript
-
-function mostrarispostaJSON(risposta) {
-
-    //Chiamata anteprima della prima risposta JSON
-    immaginiOttenute = risposta; //Aggiorno JSON globale. Visibile agli altri.
-    var mRispostaJS = risposta;
-    mostraGalleria(risposta); //Costruisco Galleria
-    prossima_pagina = mRispostaJS.next_page; //URL Pagina Prossimi Risultati
-    mImage = mRispostaJS.photos[0].src.large; //URL Immagine large
-    mAutore = mRispostaJS.photos[0].photographer; //Nome Fotografo
-    mAutoreURL = mRispostaJS.photos[0].photographer_url; //URL Profilo Fotografo
-    $('#immagineAttiva').attr("src", mImage); 
-    $('#autore').text("📸 Autore : @" + mAutore);
-    $('#autore').on("click", function() {
-        window.open(mAutoreURL, '_blank')
-    })
-}
-```
-
-I 3 bottoni disponibili in seguito alla ricerca sono i seguenti:
-
-![3 bottoni](https://github.com/wildLori/Sfondino/blob/main/assets/screen/Immagine%202020-12-08%20212942.png?raw=true)
-
-| ![image-20201208214146252](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/1.png) | ![image-20201208214201969](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/2.png) | ![image-20201208214227736](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/3.png) |
-| ------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- |
-| Tasto Download                                    | Tasto Cambia Colore                               | Tasto Ricerca Keyword                             |
-
-#### Download ⚙️
-
-Il download diretto è ostacolato dalla protezione XSS.
-Per aggirare il problema, ho deciso di consentire il **download manuale** da una scheda separata.
-
-```javascript
-function openInNewTab(url) {
-    //Splitto la stringa al "?" in modo da aprire la foto originale
-    var sub = url.split("?");
-    var mUrl = sub[0];
-    var win = window.open(mUrl, '_blank');
-    win.focus();
-}
-```
-
-#### Nuova Ricerca ⚙️
-
-Come detto sopra, la Keyword di ricerca predefinita è "Wallpaper". Tramite la <input> a comparsa è possibile cambiare la Keyword.
-
-```js
-jQuery("#ricercaQuery").on('keyup', function(e) {
-//Controllo se l'utente ha schiacciato "Invio"
-	if (e.key === 'Enter' || e.keyCode === 13) {
-		var temp = jQuery("#ricercaQuery").val();
-			//Controllo che non sia vuoto il campo
-			if (temp == "" || temp == undefined) {
-                alert("Non lasciare il campo vuoto.")
-            } else {
-                scelte.keyword = temp;
-                $("#immagineAttiva").fadeTo(500, 0.0);
-                setTimeout(function() {
-                    getQuery(scelte.keyword, scelte.orientation, scelte.colore);
-                }, 900);
-            }}});
-```
-
-#### Autenticazione JWT ⚙️
-
-L'autenticazione JWT funziona con questo flow:
-
-1. L'utente carica la pagina /auth
-2. 
-
-```javascript
-function mostraGalleria(immagini) {
-    
-    $('html,body').animate({
-        scrollTop: $('#mioWrapperGalleria').offset().top
-    }, 'slow');
-
-    var galleria = document.getElementById('mioWrapperGalleria');
-    galleria.focus();
-    galleria.innerHTML = "";
-    var quanti = 15; //Numero di riquadri predefinito
-	// Scansione del mio JSON e aggiunta di ogni immagine alla Galleria
-    for (let index = 0; index < quanti; index++) {
-        const immagineGalleria = document.createElement("div");
-        immagineGalleria.classList.add("immagineGalleria");
-        var mFotografo = immagini.photos[index].photographer;
-        var mUrl = immagini.photos[index].src.medium;
-        immagineGalleria.innerHTML = `
-            <img
-                src="${mUrl}"
-                alt=""
-            />
-            <div class="img-info card stretto">
-                <p>${"@" + mFotografo}</p>
-            </div>
-        `;
-        galleria.appendChild(immagineGalleria);
-    };
-
-}
-```
-
-![image-20201208230111736](https://raw.githubusercontent.com/wildLori/Sfondino/main/assets/screen/galleria.png)
-
-
-## Nota sulla Responsiveness ❗
-
-Come citato sopra, ho utilizzato la **Simple Grid CSS** per facilitarmi la costruzione e l'allineamento dei Div, senza dover ricorrere a un intero Framework (ad esempio *Bootstrap*).
-
-Ho modificato e sovrascritto a piacimento la base proposta dalla Simple Grid.
-Le animazioni sono fatte attraverso **jQuery** e attraverso alcuni custom **Keyframe CSS.**
 
 ## Da Aggiungere / Sistemare ➕🔧
 
