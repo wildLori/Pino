@@ -11,17 +11,51 @@ I suoi requisiti sono quelli di avere un sistema pratico e veloce che possa **cl
 
 # Contesto
 
-Con la seguente si introduce 
+Con i due paragrafi seguenti si vogliono introdurre la situazione attuale e l'obiettivo del progettino.
 
-# Stack tecnologie
+## As Is - Situazione Pre-Progetto
 
-- 
+> Vedasi prima le righe introduttive in cima al documento.
+> Al momento mio padre lavora in questo modo:
+
+1. Scende fisicamente dall'ufficio per andare in officina
+2. Scatta le foto con lo smartphone
+3. Torna in ufficio
+4. Collega il cellulare al computer, cerca nella galleria, e copia le immagini che gli servono 
+
+Il collo di bottiglia attuale è rappresentato dall'ultimo passaggio:
+
+- Spazio nella memoria attuale
+
+## To Be - Obiettivo Post-Progetto
+
+L'obiettivo del progetto è quello di ottenere un sistema che migliori il processo attuale:
+
+Deve:
+
+- Sfruttare un **client** facilmente **fruibile** attraverso lo **smartphone** 
+
+- **Comprimere** le immagini
+- **Categorizzare** le immagini
+- **Stampare** eventuali testi / annotazioni su immagini
+- Rendere disponibili le **immagini in cloud** per un tot di tempo
+- **Scaricare e Sincronizzare** le immagini su computer aziendale 
 
 # Struttura Progetto
 
-### Attori Software
+## Attori di Sistema e Stack Tecnologie
 
-#### Stack Tecnologie Software
+Gli attori di Sistema sono i componenti fisici e non coinvolti nella parte sistemistica del progetto.
+
+- **ROUTER E FIRMWARE :** AGTHP_2.1.0 (TIM HUB 2019)
+- **SERVER** **E OS**: Raspberry Pi 4 (Modello 4GB di RAM) con Raspbian ARM 32-bit
+
+- **dynDNS PROVIDER** : [No-IP](https://www.noip.com/)
+- **SSL CERTIFICATE :** [Let's Encrypt](https://letsencrypt.org/)
+
+
+
+## Attori Software e Stack Tecnologie
 
 - **DATABASE** : *Sqlite* 
 - **RUNTIME** : *Node.js*
@@ -30,28 +64,16 @@ Con la seguente si introduce
 
 Altre tecnologie :
 
-- **WEBHOOK :** *DynDNS (No-IP) + SSL (Let's Encrypt)*
 - **CLOUD STORAGE** : *Google Drive API*
-- **CLOUD AUTH** : *OAuth*
-- **AUTHENTICATION** : *JWT*
+- **CLOUD AUTH** : *OAuth* *(gestito da GoogleAPIs - Node.js)*
+- **AUTHENTICATION** : *JWT* (Json Web Token)
 - **TELEGRAM API :** *Telegraf.js*
+- **WEBHOOK :** (Vedi paragrafo successivo)
 - **CHIAMATE HTTP DA CLI :** *Axios*
 - **CHIAMATE HTTP DA WEB:** *AJAX (jQuery)*
 
 > *Cito Axios perchè utilizzato esplicitamente nella CLI.*
 > *Probabilmente compare già come dipendenza da parte di altre librerie che effettuano chiamate HTTP*
-
-### Attori Hardware
-
-Gli attori Hardware sono i componenti fisici direttamente coinvolti nella struttura del progetto.
-
-- ROUTER CASALINGO
-- 
-
-#### Stack Tecnologie Hardware
-
-- OS SERVER : Raspbian ARM 32-bit
-- 
 
 
 
