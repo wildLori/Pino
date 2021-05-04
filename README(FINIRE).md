@@ -1,4 +1,8 @@
+
+
 # Documentazione Progetto Sistemi + Bot Telegram
+
+LINK AL VIDEO : https://youtu.be/0O0BCj2DI0I
 
 Ho deciso di creare un sistema che sfruttasse **Telegram** per semplificare il lavoro di organizzazione e sincronizzazione di immagini svolto da mio padre in azienda.
 I suoi requisiti sono quelli di avere un sistema pratico e veloce che possa **classificare** ed eventualmente **aggiungere annotazioni** su **immagini**, per poi averle direttamente sul suo computer aziendale in una **specifica cartella.**
@@ -16,16 +20,21 @@ Con i due paragrafi seguenti si vogliono introdurre la situazione attuale e l'ob
 ## As Is - Situazione Pre-Progetto
 
 > Vedasi prima le righe introduttive in cima al documento.
-> Al momento mio padre lavora in questo modo:
 
-1. Scende fisicamente dall'ufficio per andare in officina
-2. Scatta le foto con lo smartphone
-3. Torna in ufficio
-4. Collega il cellulare al computer, cerca nella galleria, e copia le immagini che gli servono 
+Al momento mio padre lavora in questo modo: 
 
-Il collo di bottiglia attuale è rappresentato dall'ultimo passaggio:
+1. Scende fisicamente dall'ufficio per andare in officina, scatta le foto sui pezzi meccanici che gli interessano e torna in ufficio.
+2. **Collega** il cellulare al computer, **cerca** nella galleria, e **copia** le immagini che gli servono dal cellulare al computer
+3. **Sistema** i file e li **carica** nella cartella di rete aziendale
+4. **Apre** in *GIMP* le immagini per **aggiungere** **del testo** e per **compirmerle**, in modo da renderle più adatte ai documenti digitali in modo da non gravare troppo sulla dimensione finale dei documenti.
 
-- Spazio nella memoria attuale
+Il collo di bottiglia è ovviamente rappresentato dagli ultimi passaggi:
+
+- **Tempo di organizzazione** dei file
+- **Tempo di Apertura** in GIMP per operazioni ripetitive (compressione e aggiunta testi) 
+- Le numerose foto **occupano** **spazio** sul cellulare e anche sui dischi
+
+
 
 ## To Be - Obiettivo Post-Progetto
 
@@ -41,6 +50,14 @@ Deve:
 - Rendere disponibili le **immagini in cloud** per un tot di tempo
 - **Scaricare e Sincronizzare** le immagini su computer aziendale 
 
+
+
+### Considerazioni
+
+Client1 : decido di utilizzare Telegram in quanto
+Client2 : decido di utilizzare un programma CLI che giri in background
+Hosting Server: decido di crearlo in casa utilizzando un Raspberry
+
 # Struttura Progetto
 
 ## Attori di Sistema e Stack Tecnologie
@@ -52,6 +69,12 @@ Gli attori di Sistema sono i componenti fisici e non coinvolti nella parte siste
 
 - **dynDNS PROVIDER** : [No-IP](https://www.noip.com/)
 - **SSL CERTIFICATE :** [Let's Encrypt](https://letsencrypt.org/)
+
+### Certificato SSL
+
+Let's Encrypt:
+
+>A nonprofit Certificate Authority providing TLS certificates to **260 million** websites.
 
 
 
@@ -96,34 +119,24 @@ La chiave e il certificato sono salvati nella cartella ​📁​`private/`
 - **Privkey.pem**
 
 ```js
-//www/bin
-
-/**
- * Dotenv : porta del server + chiavi SSL
- */
-
-require('dotenv').config({ path: path.resolve(__dirname, '../private/.env') })
-var certificatePath = path.resolve(__dirname,'../private/fullchain.pem');  //SSL - Related
-var privateKeyPath = path.resolve(__dirname,'../private/privkey.pem');
-var port = process.env.PORT;
-
-app.set('port', port);
-
-/**
- * Istanzia server HTTPS con Node
- */
-
-var server = https.createServer({
-  key: fs.readFileSync(privateKeyPath),
-  cert: fs.readFileSync(certificatePath)
-}, app)
-.listen(port, function () {
-console.log(`Attiva sulla porta ${port}!)
-})
-
-server.on('error', onError);
-server.on('listening', onListening);
+x //www/bin/** * Dotenv : porta del server + chiavi SSL */require('dotenv').config({ path: path.resolve(__dirname, '../private/.env') })var certificatePath = path.resolve(__dirname,'../private/fullchain.pem');  //SSL - Relatedvar privateKeyPath = path.resolve(__dirname,'../private/privkey.pem');var port = process.env.PORT;app.set('port', port);/** * Istanzia server HTTPS con Node */var server = https.createServer({  key: fs.readFileSync(privateKeyPath),![image-20210504101409010](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210504101409010.png)  cert: fs.readFileSync(certificatePath)}, app).listen(port, function () {console.log(`Attiva sulla porta ${port}!)})server.on('error', onError);server.on('listening', onListening);
 ```
+
+![image-20210504101510003](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210504101510003.png)
+
+![image-20210504101537364](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210504101537364.png)
+
+![image-20210504101555127](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210504101555127.png)
+
+![image-20210504101618809](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210504101618809.png)
+
+![image-20210504101656776](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210504101656776.png)
+
+![telegram-getupdates-vs-setwebhook](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\telegram-getupdates-vs-setwebhook.png)
+
+![documentazione_telegram_schemi-Copy of Flusso CLI](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\documentazione_telegram_schemi-Copy of Flusso CLI.svg)
+
+![documentazione_telegram_schemi-Struttura di Rete](D:\02 - Dev\04 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\documentazione_telegram_schemi-Struttura di Rete.svg)
 
 
 
@@ -253,21 +266,4 @@ Flow della CLI
 
 
 
-## Da Aggiungere / Sistemare ➕🔧
-
-#### Aggiungere ➕
-
-- Ricerca in lingua != Inglese al momento produce meno risultati. *Devo aggiustare coi parametri di ricerca nella query, quanto meno aggiungendo la voce it-IT.*
-
-- Ricerca con Colore Personalizzato (non generato)
-- Navigazione continua (possibilità di tornare indietro e avanti, con controllo sui parametri scelti)
-- Link al fotografo anche nella galleria e sostituzione del
-
-#### Sistemare 🔧
-
-- **PROBLEMA** : Avrei voluto mettere il contenuto Dinamico dell'HTML in un JSON.
-  Tuttavia, il JSON non accetta l'andare a capo. Mi sono reso conto dopo che avrei potuto mettere tutto su una riga e utilizzare una visualizzazione a parte per modificare a piacimento l'HTML.
-
-- **Download** con bottone. Crossed Origin Download negato da politiche del browser.
-  - Workaround: Anzichè eseguire un Download diretto, si viene re-indirizzati a una nuova tab.
-- **Padding** e **Allineamento** della Galleria da Mobile.
+- 
