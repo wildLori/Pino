@@ -11,7 +11,35 @@ I suoi requisiti sono quelli di avere un sistema pratico e veloce che possa **cl
 
 ## Indice
 
-[TOC]
+- [Documentazione Progetto Sistemi + Bot Telegram](#documentazione-progetto-sistemi--bot-telegram)
+  - [Indice](#indice)
+- [Contesto](#contesto)
+  - [As Is - Situazione Pre-Progetto](#as-is---situazione-pre-progetto)
+  - [To Be - Obiettivo Post-Progetto](#to-be---obiettivo-post-progetto)
+    - [Considerazioni](#considerazioni)
+  - [Attori di Sistema e Stack Tecnologie](#attori-di-sistema-e-stack-tecnologie)
+  - [Diagramma di rete](#diagramma-di-rete)
+  - [Attori Software e Stack Tecnologie](#attori-software-e-stack-tecnologie)
+  - [Hosting e Webhook](#hosting-e-webhook)
+    - [Dynamic DNS](#dynamic-dns)
+    - [Certificato SSL e Port Forwarding](#certificato-ssl-e-port-forwarding)
+    - [Let's Encrypt e Certbot](#lets-encrypt-e-certbot)
+    - [Creazione Server HTTPS](#creazione-server-https)
+  - [Database e Variabili d'ambiente](#database-e-variabili-dambiente)
+    - [Model Manager (DB)](#model-manager-db)
+    - [DotEnv (variabili d'ambiente)](#dotenv-variabili-dambiente)
+  - [Route](#route)
+    - [Route /auth e /officina (Dashboard Web)](#route-auth-e-officina-dashboard-web)
+    - [JWT](#jwt)
+    - [EJS](#ejs)
+  - [Telegram BOT](#telegram-bot)
+    - [Funzionalità](#funzionalità)
+    - [](#)
+      - [Cambio e creazione tag ⚙️](#cambio-e-creazione-tag-️)
+      - [Stampa Testo](#stampa-testo)
+      - [Upload ⚙️](#upload-️)
+- [CLI](#cli)
+- [Conclusione](#conclusione)
 
 # Contesto
 
