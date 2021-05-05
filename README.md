@@ -1,4 +1,5 @@
 
+![logo](https://raw.githubusercontent.com/wildLori/Pino/596a3962c1cf233b79ca3b4c245e6fed37f2ec03/public/images/logo.svg)
 
 # Documentazione Progetto Sistemi + Bot Telegram
 
@@ -86,7 +87,7 @@ Client1 : decido di utilizzare Telegram in quanto client facilmente utilizzabile
 Client2 : decido di utilizzare un programma CLI che giri in background sul computer aziendale
 Hosting Server: decido di crearlo in casa utilizzando un Raspberry
 
-![Untitled Diagram-Copy of Copy of Struttura di Rete](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\Untitled Diagram-Copy of Copy of Struttura di Rete.svg)
+![Untitled Diagram-Copy of Copy of Struttura di Rete](https://raw.githubusercontent.com/wildLori/Pino/596a3962c1cf233b79ca3b4c245e6fed37f2ec03/public/images/documentazione_telegram_schemi-Struttura%20di%20Rete.svg)
 
 
 
@@ -175,7 +176,7 @@ Dal browser tuttavia, non si ha nessuna risposta finchè non si soddisfano due r
 
 Si osservi nuovamente lo schema di rete:
 
-![documentazione_telegram_schemi-Struttura di Rete](https://mega.nz/file/y4oAlJgB#P3hLBKq__ijwijfbg1c-RvUlmEMwO7QfknAvxkz9WtA)
+![documentazione_telegram_schemi-Struttura di Rete](https://raw.githubusercontent.com/wildLori/Pino/596a3962c1cf233b79ca3b4c245e6fed37f2ec03/public/images/documentazione_telegram_schemi-Struttura%20di%20Rete.svg)
 
 ![Configurazione Port Mapping - Internet: Modem ADSL e Fibra TIM - Assistenza  Tecnica 187 Alice Telecom Italia.](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\technicolor_port_2)
 
@@ -370,7 +371,7 @@ Dalla dashboard è possibile **accettare** o **rifiutare** un utente. L'aggiunta
 
 Ogni chiamata effettuata in questa sezione utilizza il JWT come middleware. 
 
-![documentazione_telegram_schemi-Copy of Flusso CLI](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\documentazione_telegram_schemi-Copy of Flusso CLI.svg)
+![documentazione_telegram_schemi-Copy of Flusso CLI](https://github.com/wildLori/Pino/blob/main/public/images/documentazione_telegram_schemi-Copy%20of%20Flusso%20CLI.svg)
 
 1. CLIENT : Utente **effettua il login /auth**
 
@@ -740,8 +741,8 @@ async function listFiles(dataUTC) {
 
 Riguardando lo schema di rete inzialmente presentato, è possibile capire meglio la struttura del progetto.
 
-![Untitled Diagram-Copy of Copy of Struttura di Rete](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\Untitled Diagram-Copy of Copy of Struttura di Rete.svg)
+![Untitled Diagram-Copy of Copy of Struttura di Rete](https://raw.githubusercontent.com/wildLori/Pino/596a3962c1cf233b79ca3b4c245e6fed37f2ec03/public/images/Untitled%20Diagram-Copy%20of%20Copy%20of%20Struttura%20di%20Rete.svg)
 
 
 
-![documentazione_telegram_schemi-Struttura di Rete](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\documentazione_telegram_schemi-Struttura di Rete.svg)
+![documentazione_telegram_schemi-Struttura di Rete](https://raw.githubusercontent.com/wildLori/Pino/596a3962c1cf233b79ca3b4c245e6fed37f2ec03/public/images/documentazione_telegram_schemi-Struttura%20di%20Rete.svg)
