@@ -132,7 +132,7 @@ Altre tecnologie :
 
 Il Webhook è un metodo che permette di ricevere notifiche da un Server anzichè eseguire il polling su di esso. 
 Nel progetto viene utilizzate per ricevere update da Telegram anzichè 
-Il **vantaggio** sta nel **risparmio di chiamate HTTP superflue.**![telegram-getupdates-vs-setwebhook](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\telegram-getupdates-vs-setwebhook.png)
+Il **vantaggio** sta nel **risparmio di chiamate HTTP superflue.**![telegram-getupdates-vs-setwebhook](https://i.ibb.co/rGsSjF7/telegram-getupdates-vs-setwebhook.png)
 
 
 
@@ -152,7 +152,7 @@ Un provider **DynamicDNS** è un fornitore di servizi che permette di registrare
 
 Sul router è installato uno script che, ad ogni nuovo ottenimento di indirizzo IP, comunica il proprio indirizzo al Provider di DynamicDNS.
 
-![image-20210505083805480](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210505083805480.png)
+![image-20210505083805480](https://i.ibb.co/Bf8sHyx/image-20210505083805480.png)
 
 Questa qua sopra è il **pannello di controllo di NO-IP**, permette di monitore gli hostname registrati con il loro provider.
 
@@ -175,7 +175,7 @@ Dal browser tuttavia, non si ha nessuna risposta finchè non si soddisfano due r
 
 Si osservi nuovamente lo schema di rete:
 
-![documentazione_telegram_schemi-Struttura di Rete](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\documentazione_telegram_schemi-Struttura di Rete.svg)
+![documentazione_telegram_schemi-Struttura di Rete](https://mega.nz/file/y4oAlJgB#P3hLBKq__ijwijfbg1c-RvUlmEMwO7QfknAvxkz9WtA)
 
 ![Configurazione Port Mapping - Internet: Modem ADSL e Fibra TIM - Assistenza  Tecnica 187 Alice Telecom Italia.](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\technicolor_port_2)
 
@@ -200,7 +200,7 @@ Certbot funziona in questo modo:
 
 
 
-![image-20210505084028878](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210505084028878.png)
+![image-20210505084028878](https://i.ibb.co/wLZypRz/image-20210505084028878.png)
 
 ### Creazione Server HTTPS
 
@@ -248,7 +248,7 @@ console.log(`Attiva sulla porta ${port}! Test qua -> https://belfanti.ddns.net:8
 Il progetto utilizza la convenzione di progetti **node basati su Express.**
 L'entry point è nella cartella `📂www/bin`
 
-| ![image-20210504101510003](image-20210504101510003.png) | ![image-20210504101537364](image-20210504101537364.png) | ![image-20210504101555127](image-20210504101555127.png) | ![image-20210504101618809](image-20210504101618809.png) | ![image-20210504101656776](image-20210504101656776.png) |
+| ![image-20210504101510003](https://i.ibb.co/YdZBWLX/image-20210504101409010.png) | ![image-20210504101537364](https://i.ibb.co/TWgW0YP/image-20210504101537364.png) | ![image-20210504101555127](https://i.ibb.co/vBcQNRX/image-20210504101555127.png) | ![image-20210504101618809](https://i.ibb.co/6Nr3t7r/image-20210504101618809.png) | ![image-20210504101656776](https://i.ibb.co/StV3z5h/image-20210504101656776.png) |
 | ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- |
 | Route                                                   | Views                                                   | Helper Class                                            | Private Data                                            | Public Data                                             |
 
@@ -362,7 +362,7 @@ Ogni rotta è gestita da una classe Javascript istanza di Router.
 
 ### Route /auth e /officina (Dashboard Web)
 
-![image-20210505101329940](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210505101329940.png)
+![image-20210505101329940](https://i.ibb.co/J2WDzzr/image-20210505101329940.png)
 
 Dalla dashboard è possibile **accettare** o **rifiutare** un utente. L'aggiunta avviene ogni volta che un utente non autorizzato avvia il bot.
 
@@ -524,7 +524,7 @@ L'esempio qui sotto esegue il riempimento di una tabella senza utilizzare codice
 
 
 
-![image-20210505101406707](C:\Users\Lorenzo\Documents\02 - Dev\02 - Scuola\00 - Pratiche\02 - Tpsit\000 - Teoria\docs\image-20210505101406707.png)
+![image-20210505101406707](https://i.ibb.co/t3w6zNV/image-20210505101406707.png)
 
 Questo è lo script che avviene ogni volta che si preme il bottone
 
