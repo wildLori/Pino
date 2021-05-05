@@ -126,7 +126,6 @@ async function listFiles(dataUTC) {
     drive.files.list({
       folderId: folderUrl,
       fields: "files/webContentLink",
-      //q: "modifiedTime > '" + dataUTC + ''
       q: `modifiedTime > '${dataUTC}'`
     }, (err, res) => {
       /**

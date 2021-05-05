@@ -15,7 +15,7 @@
     var image = await Jimp.read(url);
     console.log("Ho scaricato il file")
     console.log(image.bitmap.width, image.bitmap.height, testo);
-    //await image.print(font, image.bitmap.width, image.bitmap.height-100, testo); //3. Scrivo su immagine
+
     await image.print(font, 30, 30, testo); //3. Scrivo su immagine
     await image.getBuffer(image.getMIME().toString(), (err, buffer) => {
       if (err) console.log(err)
