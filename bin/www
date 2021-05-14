@@ -35,7 +35,7 @@ var server = https.createServer({
   cert: fs.readFileSync(certificatePath)
 }, app)
 .listen(port, function () {
-console.log(`Attiva sulla porta ${port}! Test qua -> https://belfanti.ddns.net:8443`)
+console.log(`Attiva sulla porta ${port}! Test qua -> https://.......:0000`)
 })
 
 /**
