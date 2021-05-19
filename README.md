@@ -3,7 +3,7 @@
 
 # Documentazione Progetto Sistemi + Bot Telegram
 
-LINK AL VIDEO : https://youtu.be/0O0BCj2DI0I
+LINK AL VIDEO : [Private]
 
 Ho deciso di creare un sistema che sfruttasse **Telegram** per semplificare il lavoro di organizzazione e sincronizzazione di immagini svolto da mio padre in azienda.
 I suoi requisiti sono quelli di avere un sistema pratico e veloce che possa **classificare** ed eventualmente **aggiungere annotazioni** su **immagini**, per poi averle direttamente sul suo computer aziendale in una **specifica cartella.**
